@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
-import { Html5QrcodeScanner } from 'html5-qrcode'
+import { Html5Qrcode } from 'html5-qrcode'
 
 export default function Entry() {
     const navigate = useNavigate()
@@ -42,26 +42,42 @@ export default function Entry() {
         if (error) console.error('Error fetching clients:', error)
     }
 
-    const startScanner = () => {
+    const startScanner = async () => {
         setIsScanning(true)
         // Small delay to ensure DOM is ready
-        setTimeout(() => {
-            const scanner = new Html5QrcodeScanner(
-                "reader",
-                { fps: 10, qrbox: { width: 250, height: 250 } },
-            /* verbose= */ false
-            );
+        setTimeout(async () => {
+            try {
+                const html5QrCode = new Html5Qrcode("reader");
+                scannerRef.current = html5QrCode;
 
-            scanner.render(onScanSuccess, onScanFailure);
-            scannerRef.current = scanner;
-        }, 100)
+                const config = {
+                    fps: 10,
+                    qrbox: { width: 250, height: 250 }
+                };
+
+                await html5QrCode.start(
+                    { facingMode: "environment" },
+                    config,
+                    onScanSuccess,
+                    onScanFailure
+                );
+            } catch (err) {
+                console.error("Error starting camera:", err);
+                alert("No se pudo acceder a la cámara. Asegúrate de dar permisos en el navegador y usar HTTPS.");
+                setIsScanning(false);
+            }
+        }, 300)
     }
 
-    const stopScanner = () => {
+    const stopScanner = async () => {
         if (scannerRef.current) {
-            scannerRef.current.clear().catch(error => {
-                console.error("Failed to clear html5-qrcode scanner. ", error);
-            });
+            try {
+                if (scannerRef.current.isScanning) {
+                    await scannerRef.current.stop();
+                }
+            } catch (error) {
+                console.error("Failed to stop scanner: ", error);
+            }
             scannerRef.current = null;
         }
         setIsScanning(false)
@@ -224,7 +240,9 @@ export default function Entry() {
                         {/* Scanner Container Area */}
                         {isScanning && (
                             <div className="fixed inset-0 z-50 bg-black flex flex-col items-center justify-center p-4">
-                                <div id="reader" className="w-full max-w-sm bg-white rounded-lg overflow-hidden"></div>
+                                <div id="reader" className="w-full max-w-sm bg-white rounded-lg overflow-hidden min-h-[300px] flex items-center justify-center">
+                                    <p className="text-gray-500 animate-pulse">Iniciando cámara...</p>
+                                </div>
                                 <button
                                     onClick={stopScanner}
                                     className="mt-4 bg-white text-black px-6 py-3 rounded-full font-bold"

@@ -2,7 +2,7 @@
 import { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
-import { Html5QrcodeScanner } from 'html5-qrcode'
+import { Html5Qrcode } from 'html5-qrcode'
 
 export default function Exit() {
     const navigate = useNavigate()
@@ -68,22 +68,41 @@ export default function Exit() {
         }
     }
 
-    const startScanner = () => {
+    const startScanner = async () => {
         setIsScanning(true)
-        setTimeout(() => {
-            const scanner = new Html5QrcodeScanner(
-                "reader-exit",
-                { fps: 10, qrbox: { width: 250, height: 250 } },
-                false
-            );
-            scanner.render(onScanSuccess, onScanFailure);
-            scannerRef.current = scanner;
-        }, 100)
+        setTimeout(async () => {
+            try {
+                const html5QrCode = new Html5Qrcode("reader-exit");
+                scannerRef.current = html5QrCode;
+
+                const config = {
+                    fps: 10,
+                    qrbox: { width: 250, height: 250 }
+                };
+
+                await html5QrCode.start(
+                    { facingMode: "environment" },
+                    config,
+                    onScanSuccess,
+                    onScanFailure
+                );
+            } catch (err) {
+                console.error("Error starting camera:", err);
+                alert("No se pudo acceder a la cámara. Revisa los permisos del navegador.");
+                setIsScanning(false);
+            }
+        }, 300)
     }
 
-    const stopScanner = () => {
+    const stopScanner = async () => {
         if (scannerRef.current) {
-            scannerRef.current.clear().catch(e => console.error(e));
+            try {
+                if (scannerRef.current.isScanning) {
+                    await scannerRef.current.stop();
+                }
+            } catch (e) {
+                console.error("Error stopping scanner:", e);
+            }
             scannerRef.current = null;
         }
         setIsScanning(false)
@@ -151,7 +170,9 @@ export default function Exit() {
                 {/* Scanner Overlay */}
                 {isScanning && (
                     <div className="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center p-4">
-                        <div id="reader-exit" className="w-full max-w-sm bg-white rounded-lg overflow-hidden"></div>
+                        <div id="reader-exit" className="w-full max-w-sm bg-white rounded-lg overflow-hidden min-h-[300px] flex items-center justify-center">
+                            <p className="text-gray-500 animate-pulse">Iniciando cámara...</p>
+                        </div>
                         <button onClick={stopScanner} className="mt-4 bg-white text-black px-6 py-3 rounded-full font-bold">Cancelar</button>
                     </div>
                 )}
