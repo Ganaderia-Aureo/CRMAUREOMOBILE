@@ -1,0 +1,26 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #11d442;
+  --color-danger: #ef4444;
+  --color-background-light: #f6f8f6;
+  --color-background-dark: #102215;
+  --font-display: "Inter", "sans-serif";
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-2xl: 1rem;
+}
+
+@layer base {
+  body {
+    @apply font-display bg-background-light dark:bg-background-dark text-gray-900 dark:text-white antialiased touch-manipulation;
+  }
+}
+
+.fat-finger-input {
+  min-height: 64px !important;
+}
+
+.fat-finger-btn {
+  min-height: 60px !important;
+}
