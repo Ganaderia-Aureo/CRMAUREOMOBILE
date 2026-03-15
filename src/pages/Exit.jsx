@@ -1,8 +1,9 @@
 
 import { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
+import toast from 'react-hot-toast'
 import { supabase } from '../lib/supabase'
-import { Html5Qrcode } from 'html5-qrcode'
+import { Html5Qrcode, Html5QrcodeSupportedFormats } from 'html5-qrcode'
 
 export default function Exit() {
     const navigate = useNavigate()
@@ -28,17 +29,18 @@ export default function Exit() {
             `)
                 .ilike('crotal', `%${term}`)
                 .eq('status', 'ACTIVE')
+                .is('deleted_at', null)
                 .limit(1)
 
             if (error) throw error
             if (data && data.length > 0) {
                 setAnimal(data[0])
             } else {
-                alert("No se encontró ningún animal activo con ese crotal.")
+                toast.error("No se encontró ningún animal activo con ese crotal.")
             }
         } catch (error) {
             console.error("Error searching:", error)
-            alert(error.message)
+            toast.error(error.message)
         }
     }
 
@@ -56,13 +58,12 @@ export default function Exit() {
 
             if (error) throw error
 
-            alert("Baja realizada correctamente.")
+            toast.success("Baja realizada correctamente.")
             setAnimal(null)
             setSearch('')
-            navigate('/') // Return to dashboard or stay? Maybe stay to process more.
         } catch (error) {
             console.error("Error processing exit:", error)
-            alert("Error al dar de baja: " + error.message)
+            toast.error("Error al dar de baja: " + error.message)
         } finally {
             setConfirming(false)
         }
@@ -70,14 +71,27 @@ export default function Exit() {
 
     const startScanner = async () => {
         setIsScanning(true)
+        // Delay longer on iOS Safari where DOM paint is slower
         setTimeout(async () => {
             try {
-                const html5QrCode = new Html5Qrcode("reader-exit");
+                const html5QrCode = new Html5Qrcode("reader-exit", {
+                    formatsToSupport: [
+                        Html5QrcodeSupportedFormats.QR_CODE,
+                        Html5QrcodeSupportedFormats.CODE_128,
+                        Html5QrcodeSupportedFormats.CODE_39,
+                        Html5QrcodeSupportedFormats.EAN_13,
+                        Html5QrcodeSupportedFormats.EAN_8,
+                        Html5QrcodeSupportedFormats.ITF,
+                    ],
+                    experimentalFeatures: { useBarCodeDetectorIfSupported: true },
+                    verbose: false,
+                });
                 scannerRef.current = html5QrCode;
 
                 const config = {
                     fps: 10,
-                    qrbox: { width: 250, height: 250 }
+                    qrbox: { width: 300, height: 120 },
+                    aspectRatio: 1.7777778,
                 };
 
                 await html5QrCode.start(
@@ -88,10 +102,10 @@ export default function Exit() {
                 );
             } catch (err) {
                 console.error("Error starting camera:", err);
-                alert("No se pudo acceder a la cámara. Revisa los permisos del navegador.");
+                toast.error("No se pudo acceder a la cámara. Revisa los permisos del navegador.");
                 setIsScanning(false);
             }
-        }, 300)
+        }, 500)
     }
 
     const stopScanner = async () => {
@@ -170,8 +184,8 @@ export default function Exit() {
                 {/* Scanner Overlay */}
                 {isScanning && (
                     <div className="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center p-4">
-                        <div id="reader-exit" className="w-full max-w-sm bg-white rounded-lg overflow-hidden min-h-[300px] flex items-center justify-center">
-                            <p className="text-gray-500 animate-pulse">Iniciando cámara...</p>
+                        <div id="reader-exit" className="w-full max-w-sm bg-white rounded-xl min-h-[300px]">
+                            <p className="text-gray-500 animate-pulse text-center pt-8">Iniciando cámara...</p>
                         </div>
                         <button onClick={stopScanner} className="mt-4 bg-white text-black px-6 py-3 rounded-full font-bold">Cancelar</button>
                     </div>

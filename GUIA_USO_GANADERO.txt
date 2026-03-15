@@ -1,0 +1,73 @@
+================================================================================
+                    GUÍA DE USO: GANADERÍA ÁUREO MOBILE
+================================================================================
+
+Esta aplicación ha sido diseñada para ser sencilla y rápida, ideal para usar
+directamente en el campo con el teléfono móvil.
+
+--------------------------------------------------------------------------------
+1. PRIMEROS PASOS: INSTALACIÓN EN EL MÓVIL
+--------------------------------------------------------------------------------
+Para que la aplicación funcione como una "App" normal y sea más fácil de abrir:
+
+• EN ANDROID (Chrome): Abre el enlace de la aplicación, pulsa los tres puntos 
+  (arriba a la derecha) y elige "Instalar aplicación" o "Añadir a pantalla de inicio".
+• EN IPHONE (Safari): Abre el enlace, pulsa el botón de "Compartir" (el cuadrado 
+  con una flecha hacia arriba) y elige "Añadir a pantalla de inicio".
+
+Esto creará un icono de "Ganadería Áureo" en tu menú de aplicaciones.
+
+--------------------------------------------------------------------------------
+2. INICIO DE SESIÓN
+--------------------------------------------------------------------------------
+• Introduce tu correo electrónico y contraseña.
+• Si el teléfono te pregunta si quieres guardar la contraseña, di que SÍ para 
+  no tener que escribirla cada vez.
+
+--------------------------------------------------------------------------------
+3. MENU PRINCIPAL (PANEL DE CONTROL)
+--------------------------------------------------------------------------------
+Verás dos botones muy grandes para que sea fácil pulsar con los dedos:
+• BOTÓN VERDE (ENTRADA): Para registrar animales nuevos que llegan a la granja.
+• BOTÓN ROJO (SALIDA): Para registrar animales que se van o se dan de baja.
+
+--------------------------------------------------------------------------------
+4. CÓMO DAR DE ALTA UN ANIMAL (BOTÓN VERDE)
+--------------------------------------------------------------------------------
+1. ELIGE EL CLIENTE: Pulsa en la lista y selecciona el dueño de los animales.
+2. FECHA DE ENTRADA: Por defecto sale la de hoy, pero puedes cambiarla.
+3. CROTAL / IDENTIFICACIÓN:
+   - Puedes escribir el número a mano.
+   - O mejor, pulsa el botón "SCAN" (el de la cámara). Se abrirá la cámara de 
+     tu móvil. Enfoca el código de barras o QR de la orejera y el número se 
+     rellenará solo.
+4. GUARDAR: Pulsa el botón grande de abajo "GUARDAR ANIMAL". El teléfono vibrará
+   un poco para confirmarte que se ha guardado bien.
+
+*Nota: La aplicación recordará el Cliente y la Fecha para el siguiente animal, 
+así que si vas a meter 20 animales del mismo lote, solo tienes que escanear 
+el crotal y dar a guardar cada vez.*
+
+--------------------------------------------------------------------------------
+5. CÓMO DAR DE BAJA UN ANIMAL (BOTÓN ROJO)
+--------------------------------------------------------------------------------
+1. BUSCAR ANIMAL: 
+   - Puedes escribir los últimos números del crotal y darle a "BUSCAR".
+   - O usa el botón naranja de "ESCANEAR PARA BAJA" para enfocar el crotal.
+2. CONFIRMACIÓN: Verás una ficha blanca con los datos del animal que has 
+   encontrado (Cliente y Fecha de cuando entró). Asegúrate de que es el correcto.
+3. DAR DE BAJA: Pulsa el botón rojo "CONFIRMAR BAJA".
+
+--------------------------------------------------------------------------------
+6. SOLUCIÓN DE PROBLEMAS (LA CÁMARA NO ABRE)
+--------------------------------------------------------------------------------
+Si al pulsar "SCAN" te dice que no tienes permiso:
+1. Asegúrate de estar usando la dirección segura (https://...).
+2. Mira arriba en la barra de direcciones del navegador, busca un icono de un 
+   candado o ajustes, y asegúrate de que la "Cámara" está permitida.
+3. Si lo usas desde dentro de WhatsApp o Facebook, ¡no funcionará bien! Abre la 
+   aplicación en el navegador normal del móvil (Chrome o Safari).
+
+================================================================================
+Versión 1.0.2 - Ganadería Áureo Mobile
+================================================================================

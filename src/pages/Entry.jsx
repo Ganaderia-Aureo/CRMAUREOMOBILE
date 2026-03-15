@@ -1,8 +1,9 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
+import toast from 'react-hot-toast'
 import { supabase } from '../lib/supabase'
-import { Html5Qrcode } from 'html5-qrcode'
+import { Html5Qrcode, Html5QrcodeSupportedFormats } from 'html5-qrcode'
 
 export default function Entry() {
     const navigate = useNavigate()
@@ -37,22 +38,34 @@ export default function Entry() {
     }, [entryDate])
 
     const fetchClients = async () => {
-        const { data, error } = await supabase.from('clients').select('id, fiscal_name, initials').order('fiscal_name')
+        const { data, error } = await supabase.from('clients').select('id, fiscal_name, initials').is('deleted_at', null).order('fiscal_name')
         if (data) setClients(data)
         if (error) console.error('Error fetching clients:', error)
     }
 
     const startScanner = async () => {
         setIsScanning(true)
-        // Small delay to ensure DOM is ready
+        // Delay longer on iOS Safari where DOM paint is slower
         setTimeout(async () => {
             try {
-                const html5QrCode = new Html5Qrcode("reader");
+                const html5QrCode = new Html5Qrcode("reader", {
+                    formatsToSupport: [
+                        Html5QrcodeSupportedFormats.QR_CODE,
+                        Html5QrcodeSupportedFormats.CODE_128,
+                        Html5QrcodeSupportedFormats.CODE_39,
+                        Html5QrcodeSupportedFormats.EAN_13,
+                        Html5QrcodeSupportedFormats.EAN_8,
+                        Html5QrcodeSupportedFormats.ITF,
+                    ],
+                    experimentalFeatures: { useBarCodeDetectorIfSupported: true },
+                    verbose: false,
+                });
                 scannerRef.current = html5QrCode;
 
                 const config = {
                     fps: 10,
-                    qrbox: { width: 250, height: 250 }
+                    qrbox: { width: 300, height: 120 },
+                    aspectRatio: 1.7777778,
                 };
 
                 await html5QrCode.start(
@@ -63,10 +76,10 @@ export default function Entry() {
                 );
             } catch (err) {
                 console.error("Error starting camera:", err);
-                alert("No se pudo acceder a la cámara. Asegúrate de dar permisos en el navegador y usar HTTPS.");
+                toast.error("No se pudo acceder a la cámara. Asegúrate de dar permisos en el navegador y usar HTTPS.");
                 setIsScanning(false);
             }
-        }, 300)
+        }, 500)
     }
 
     const stopScanner = async () => {
@@ -97,18 +110,33 @@ export default function Entry() {
 
     const handleSave = async () => {
         if (!clientId || !crotal || !entryDate) {
-            alert("Faltan datos obligatorios (Cliente, Crotal o Fecha Entrada)")
+            toast.error("Faltan datos obligatorios (Cliente, Crotal o Fecha Entrada)")
             return
         }
 
         setSaving(true)
         try {
+            // Verificar si ya existe un animal activo con este crotal
+            const { data: existing } = await supabase
+                .from('animals')
+                .select('id, crotal')
+                .eq('crotal', crotal.trim())
+                .eq('status', 'ACTIVE')
+                .is('deleted_at', null)
+                .limit(1)
+
+            if (existing && existing.length > 0) {
+                toast.error(`Ya existe un animal activo con el crotal "${crotal}". No se puede duplicar.`)
+                setSaving(false)
+                return
+            }
+
             const { data, error } = await supabase
                 .from('animals')
                 .insert([
                     {
                         client_id: clientId,
-                        crotal: crotal,
+                        crotal: crotal.trim(),
                         entry_date: entryDate,
                         birth_date: birthDate || null,
                         status: 'ACTIVE'
@@ -135,7 +163,7 @@ export default function Entry() {
 
         } catch (error) {
             console.error("Error saving animal:", error)
-            alert("Error al guardar: " + error.message)
+            toast.error("Error al guardar: " + error.message)
         } finally {
             setSaving(false)
         }
@@ -240,8 +268,8 @@ export default function Entry() {
                         {/* Scanner Container Area */}
                         {isScanning && (
                             <div className="fixed inset-0 z-50 bg-black flex flex-col items-center justify-center p-4">
-                                <div id="reader" className="w-full max-w-sm bg-white rounded-lg overflow-hidden min-h-[300px] flex items-center justify-center">
-                                    <p className="text-gray-500 animate-pulse">Iniciando cámara...</p>
+                                <div id="reader" className="w-full max-w-sm bg-white rounded-xl min-h-[300px]">
+                                    <p className="text-gray-500 animate-pulse text-center pt-8">Iniciando cámara...</p>
                                 </div>
                                 <button
                                     onClick={stopScanner}

@@ -1,6 +1,7 @@
 
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
+import { Toaster } from 'react-hot-toast'
 import { supabase } from './lib/supabase'
 
 // Placeholder Components (will be replaced by actual files)
@@ -42,6 +43,7 @@ function ProtectedRoute({ children }) {
 function App() {
   return (
     <BrowserRouter>
+      <Toaster position="top-center" toastOptions={{ duration: 3000 }} />
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route

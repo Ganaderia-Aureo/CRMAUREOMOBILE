@@ -1,9 +1,47 @@
 
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 
 export default function Dashboard() {
     const navigate = useNavigate()
+    const [stats, setStats] = useState({ activeAnimals: 0, todayEntries: 0, todayExits: 0 })
+
+    useEffect(() => {
+        loadStats()
+    }, [])
+
+    async function loadStats() {
+        try {
+            const today = new Date().toISOString().split('T')[0]
+
+            const { count: activeAnimals } = await supabase
+                .from('animals')
+                .select('*', { count: 'exact', head: true })
+                .eq('status', 'ACTIVE')
+                .is('deleted_at', null)
+
+            const { count: todayEntries } = await supabase
+                .from('animals')
+                .select('*', { count: 'exact', head: true })
+                .eq('entry_date', today)
+                .is('deleted_at', null)
+
+            const { count: todayExits } = await supabase
+                .from('animals')
+                .select('*', { count: 'exact', head: true })
+                .eq('exit_date', today)
+                .is('deleted_at', null)
+
+            setStats({
+                activeAnimals: activeAnimals || 0,
+                todayEntries: todayEntries || 0,
+                todayExits: todayExits || 0,
+            })
+        } catch (error) {
+            console.error('Error loading stats:', error)
+        }
+    }
 
     const handleLogout = async () => {
         await supabase.auth.signOut()
@@ -29,6 +67,22 @@ export default function Dashboard() {
                     <span className="material-symbols-outlined">logout</span>
                 </button>
             </header>
+
+            {/* Stats Bar */}
+            <div className="grid grid-cols-3 gap-2 px-4 py-3 bg-white dark:bg-[#1a2e1f] border-b border-[#f0f4f1] dark:border-white/10">
+                <div className="text-center">
+                    <p className="text-2xl font-extrabold text-primary">{stats.activeAnimals}</p>
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Activos</p>
+                </div>
+                <div className="text-center border-x border-gray-200 dark:border-gray-700">
+                    <p className="text-2xl font-extrabold text-green-600">{stats.todayEntries}</p>
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Altas Hoy</p>
+                </div>
+                <div className="text-center">
+                    <p className="text-2xl font-extrabold text-red-500">{stats.todayExits}</p>
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Bajas Hoy</p>
+                </div>
+            </div>
 
             {/* Main Content (Fat Finger Buttons) */}
             <main className="flex-1 flex flex-col justify-center gap-6 p-6">
@@ -65,7 +119,7 @@ export default function Dashboard() {
                         <p>Sincronizado</p>
                     </div>
                     <p className="text-[#61896b] dark:text-[#a3c9ad]/50 text-xs font-normal opacity-70">
-                        V 1.0.2 • Mobile Web
+                        V 2.5.0 • Mobile Web
                     </p>
                 </div>
             </footer>
