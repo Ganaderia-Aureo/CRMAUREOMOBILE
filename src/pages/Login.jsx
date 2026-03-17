@@ -37,11 +37,7 @@ export default function Login() {
 
                 {/* Header / Logo Section */}
                 <div className="pt-16 pb-12 flex flex-col items-center px-10">
-                    <div className="size-24 text-primary mb-6">
-                        <svg className="w-full h-full" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-                            <path clipRule="evenodd" d="M24 0.757355L47.2426 24L24 47.2426L0.757355 24L24 0.757355ZM21 35.7574V12.2426L9.24264 24L21 35.7574Z" fill="currentColor" fillRule="evenodd"></path>
-                        </svg>
-                    </div>
+                    <img src="/logo.png" alt="Ganadería Áureo" className="size-28 mb-6 object-contain" />
                     <h1 className="text-3xl font-bold tracking-tight text-center">Ganadería Áureo</h1>
                     <p className="text-[#608a6e] mt-2 text-lg">Acceso para Campo</p>
                 </div>
